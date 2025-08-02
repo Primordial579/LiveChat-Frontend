@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    <title>Host 2 - Chat Connect</title>
+    <meta name="description" content="Join Chat Room" />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Socket.IO -->
+    <script src="https://livechat-p5h3.onrender.com/socket.io/socket.io.js"></script>
+    
+    <!-- Emoji Picker -->
+    <script src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js" type="module"></script>
+    
+    <style>
+      :root {
+        --primary: 262.1 83.3% 57.8%;
+        --primary-foreground: 210 20% 98%;
+        --background: 20 14.3% 4.1%;
+        --foreground: 60 9.1% 97.8%;
+        --card: 20 14.3% 4.1%;
+        --card-foreground: 60 9.1% 97.8%;
+        --popover: 20 14.3% 4.1%;
+        --popover-foreground: 60 9.1% 97.8%;
+        --secondary: 12 6.5% 15.1%;
+        --secondary-foreground: 60 9.1% 97.8%;
+        --muted: 12 6.5% 15.1%;
+        --muted-foreground: 24 5.4% 63.9%;
+        --accent: 12 6.5% 15.1%;
+        --accent-foreground: 60 9.1% 97.8%;
+        --destructive: 0 72.2% 50.6%;
+        --destructive-foreground: 60 9.1% 97.8%;
+        --border: 12 6.5% 15.1%;
+        --input: 12 6.5% 15.1%;
+        --ring: 262.1 83.3% 57.8%;
+        --radius: 0.5rem;
+      }
+      
+      body {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      .card {
+        background-color: hsl(var(--card));
+        color: hsl(var(--card-foreground));
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      }
+      
+      .btn-primary {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        border: 1px solid hsl(var(--primary));
+        border-radius: var(--radius);
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      
+      .btn-primary:hover {
+        background-color: hsl(var(--primary) / 0.9);
+      }
+      
+      .input-field {
+        background-color: hsl(var(--input));
+        color: hsl(var(--foreground));
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+        padding: 0.5rem 0.75rem;
+        width: 100%;
+      }
+      
+      .input-field:focus {
+        outline: 2px solid hsl(var(--ring));
+        outline-offset: 2px;
+      }
+      
+      .message-bubble {
+        max-width: 70%;
+        word-wrap: break-word;
+        border-radius: 1rem;
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+      }
+      
+      .message-sent {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        align-self: flex-end;
+        margin-left: auto;
+      }
+      
+      .message-received {
+        background-color: hsl(var(--muted));
+        color: hsl(var(--muted-foreground));
+        align-self: flex-start;
+      }
+      
+      .chat-container {
+        height: 500px;
+        overflow-y: auto;
+        padding: 1rem;
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+        background-color: hsl(var(--card));
+      }
+      
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  
+  <body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <!-- Initial Join Card -->
+      <div id="joinCard" class="card p-6">
+        <div class="text-center space-y-4">
+          <h1 class="text-2xl font-bold">Join Chat Room</h1>
+          <p class="text-muted-foreground">Ready to connect with the waiting user?</p>
+          <button id="joinBtn" class="btn-primary w-full h-12 text-lg">Join Chat</button>
+        </div>
+      </div>
+      
+      <!-- Chat Interface -->
+      <div id="chatInterface" class="hidden card p-6 w-full max-w-2xl">
+        <!-- Header -->
+        <div class="border-b border-border pb-4 mb-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-semibold">Chat with <span id="hostName">Host 1</span></h2>
+              <p id="connectionStatus" class="text-sm text-muted-foreground">Connecting...</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Messages -->
+        <div id="messagesContainer" class="chat-container">
+          <div id="messagesList" class="flex flex-col space-y-2"></div>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="mt-4 space-y-3">
+          <div class="flex gap-2">
+            <input 
+              id="messageInput" 
+              type="text" 
+              placeholder="Type a message..." 
+              class="input-field flex-1"
+            />
+            <button id="emojiBtn" class="btn-primary px-3">😊</button>
+            <label for="fileInput" class="btn-primary px-3 cursor-pointer">📎</label>
+            <input id="fileInput" type="file" class="hidden" accept="image/*,application/*" />
+            <button id="sendBtn" class="btn-primary px-4">Send</button>
+          </div>
+          
+          <!-- Emoji Picker -->
+          <div id="emojiPicker" class="hidden">
+            <emoji-picker></emoji-picker>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let socket = null;
+      let currentUser = 'Host 2';
+      let otherUser = 'Host 1';
+      
+      // DOM Elements
+      const joinCard = document.getElementById('joinCard');
+      const chatInterface = document.getElementById('chatInterface');
+      const joinBtn = document.getElementById('joinBtn');
+      const messageInput = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const emojiBtn = document.getElementById('emojiBtn');
+      const emojiPicker = document.getElementById('emojiPicker');
+      const fileInput = document.getElementById('fileInput');
+      const messagesList = document.getElementById('messagesList');
+      const messagesContainer = document.getElementById('messagesContainer');
+      const connectionStatus = document.getElementById('connectionStatus');
+      const hostName = document.getElementById('hostName');
+      
+      // Join Chat
+      joinBtn.addEventListener('click', () => {
+        joinCard.classList.add('hidden');
+        chatInterface.classList.remove('hidden');
+        connectToChat();
+      });
+      
+      // Connect to Socket.IO
+      function connectToChat() {
+        socket = io('https://livechat-p5h3.onrender.com');
+        
+        socket.on('connect', () => {
+          connectionStatus.textContent = 'Connected';
+          connectionStatus.classList.remove('text-red-500');
+          connectionStatus.classList.add('text-green-500');
+        });
+        
+        socket.on('disconnect', () => {
+          connectionStatus.textContent = 'Disconnected';
+          connectionStatus.classList.remove('text-green-500');
+          connectionStatus.classList.add('text-red-500');
+        });
+        
+        socket.on('message', (data) => {
+          if (data.sender !== currentUser) {
+            addMessage(data);
+          }
+        });
+      }
+      
+      // Send Message
+      function sendMessage() {
+        const text = messageInput.value.trim();
+        if (!text || !socket) return;
+        
+        const message = {
+          text: text,
+          sender: currentUser,
+          timestamp: new Date().toISOString()
+        };
+        
+        addMessage(message);
+        socket.emit('message', message);
+        messageInput.value = '';
+      }
+      
+      // Add Message to UI
+      function addMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-bubble ${message.sender === currentUser ? 'message-sent' : 'message-received'}`;
+        
+        if (message.file) {
+          if (message.file.type.startsWith('image/')) {
+            messageDiv.innerHTML = `
+              <img src="${message.file.content}" alt="${message.file.name}" class="max-w-full h-auto rounded" />
+              <p class="text-xs mt-2 opacity-75">${message.file.name}</p>
+            `;
+          } else {
+            messageDiv.innerHTML = `
+              <div class="flex items-center gap-2">
+                <span>📎</span>
+                <span>${message.file.name}</span>
+              </div>
+            `;
+          }
+        } else {
+          messageDiv.textContent = message.text;
+        }
+        
+        messagesList.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+      
+      // Event Listeners
+      sendBtn.addEventListener('click', sendMessage);
+      
+      messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      
+      emojiBtn.addEventListener('click', () => {
+        emojiPicker.classList.toggle('hidden');
+      });
+      
+      // Emoji Picker
+      document.addEventListener('emoji-click', (event) => {
+        messageInput.value += event.detail.unicode;
+        emojiPicker.classList.add('hidden');
+      });
+      
+      // File Upload
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file || !socket) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const message = {
+            file: {
+              name: file.name,
+              type: file.type,
+              content: event.target.result
+            },
+            sender: currentUser,
+            timestamp: new Date().toISOString()
+          };
+          
+          addMessage(message);
+          socket.emit('message', message);
+        };
+        reader.readAsDataURL(file);
+        fileInput.value = '';
+      });
+      
+      // Close emoji picker when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+          emojiPicker.classList.add('hidden');
+        }
+      });
+    </script>
+  </body>
+</html>
