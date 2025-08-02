@@ -61,6 +61,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				chat: {
+					background: 'hsl(var(--chat-background))',
+					input: 'hsl(var(--chat-input))',
+					'bubble-sent': 'hsl(var(--chat-bubble-sent))',
+					'bubble-sent-foreground': 'hsl(var(--chat-bubble-sent-foreground))',
+					'bubble-received': 'hsl(var(--chat-bubble-received))',
+					'bubble-received-foreground': 'hsl(var(--chat-bubble-received-foreground))',
+					online: 'hsl(var(--online-indicator))'
 				}
 			},
 			borderRadius: {
