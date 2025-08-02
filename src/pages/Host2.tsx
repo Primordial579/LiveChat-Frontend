@@ -23,6 +23,7 @@ const Host2 = () => {
         userName="Host 2" 
         otherUserName={hostName}
         onConnect={handleChatConnect}
+        isHost1={false}
       />
     );
   }

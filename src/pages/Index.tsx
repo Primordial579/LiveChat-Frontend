@@ -59,6 +59,7 @@ const Index = () => {
       <ChatInterface 
         userName={name}
         otherUserName="Arjav"
+        isHost1={true}
       />
     );
   }

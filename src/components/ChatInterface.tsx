@@ -24,14 +24,17 @@ interface ChatInterfaceProps {
   userName: string;
   otherUserName?: string;
   onConnect?: () => void;
+  isHost1?: boolean;
 }
 
-export const ChatInterface = ({ userName, otherUserName, onConnect }: ChatInterfaceProps) => {
+export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [displayName] = useState(userName);
+  const [receivedOtherUserName, setReceivedOtherUserName] = useState(otherUserName);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +46,13 @@ export const ChatInterface = ({ userName, otherUserName, onConnect }: ChatInterf
     socketInstance.on('connect', () => {
       setIsConnected(true);
       onConnect?.();
+      
+      // Emit appropriate connection event
+      if (isHost1) {
+        socketInstance.emit('host1-connected');
+      } else {
+        socketInstance.emit('host2-connected');
+      }
     });
 
     socketInstance.on('message', (data) => {
@@ -56,6 +66,10 @@ export const ChatInterface = ({ userName, otherUserName, onConnect }: ChatInterf
       setMessages(prev => [...prev, message]);
     });
 
+    socketInstance.on('host1-name', (hostName) => {
+      setReceivedOtherUserName(hostName);
+    });
+
     socketInstance.on('disconnect', () => {
       setIsConnected(false);
     });
@@ -65,7 +79,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect }: ChatInterf
     return () => {
       socketInstance.disconnect();
     };
-  }, [onConnect]);
+  }, [onConnect, isHost1]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -82,7 +96,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect }: ChatInterf
     };
 
     setMessages(prev => [...prev, message]);
-    socket.emit('message', { text: newMessage, sender: userName });
+    socket.emit('message', { sender: displayName, text: newMessage });
     setNewMessage('');
   };
 
@@ -111,7 +125,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect }: ChatInterf
       };
 
       setMessages(prev => [...prev, message]);
-      socket.emit('message', { file: fileData, sender: userName });
+      socket.emit('message', { sender: displayName, file: fileData });
     };
     reader.readAsDataURL(file);
   };
@@ -135,7 +149,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect }: ChatInterf
           </div>
           <div>
             <h2 className="font-semibold text-foreground">
-              {otherUserName || 'Waiting for connection...'}
+              {receivedOtherUserName || 'Waiting for connection...'}
             </h2>
             <div className="flex items-center space-x-1">
               <div className={cn(

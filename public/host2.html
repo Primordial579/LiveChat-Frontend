@@ -203,6 +203,8 @@
           connectionStatus.textContent = 'Connected';
           connectionStatus.classList.remove('text-red-500');
           connectionStatus.classList.add('text-green-500');
+          // Emit host2-connected event
+          socket.emit('host2-connected');
         });
         
         socket.on('disconnect', () => {
@@ -216,6 +218,10 @@
             addMessage(data);
           }
         });
+        
+        socket.on('host1-name', (hostName) => {
+          document.getElementById('hostName').textContent = hostName;
+        });
       }
       
       // Send Message
@@ -224,12 +230,11 @@
         if (!text || !socket) return;
         
         const message = {
-          text: text,
           sender: currentUser,
-          timestamp: new Date().toISOString()
+          text: text
         };
         
-        addMessage(message);
+        addMessage({...message, timestamp: new Date().toISOString()});
         socket.emit('message', message);
         messageInput.value = '';
       }
