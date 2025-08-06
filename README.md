@@ -1,73 +1,51 @@
-# Welcome to your Lovable project
+# 💬 LiveChat Frontend
 
-## Project info
+This is the **frontend** for the real-time 2-person chat system, built with modern responsive UI and deployed on [Vercel](https://vercel.com). It includes two separate interfaces: one for **Host 1** to initiate the chat and another for **Host 2** to join and respond.
 
-**URL**: https://lovable.dev/projects/1be9cbea-9dc4-4fde-bb7c-f440b43064aa
+## 🌐 Live
 
-## How can I edit this code?
+- **Frontend URL**: [https://livechat-orpin.vercel.app](https://livechat-orpin.vercel.app).
+- **Backend Github URL**: [https://github.com/Primordial579/LiveChat-Backend.git](https://github.com/Primordial579/LiveChat-Backend.git). 
+---
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- Clean, modern UI with **Tailwind CSS**
+- Separate pages for **Host 1** and **Host 2**
+- Real-time messaging using **Socket.IO**
+- Displays **online/offline** status for Host 2
+- Responsive on both mobile and desktop
+- Sends email notification to Host 2 when Host 1 initiates a chat
+- No file uploads (removed for security)
+- Emoji support (optional)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1be9cbea-9dc4-4fde-bb7c-f440b43064aa) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 How to Deploy
 
-**Use your preferred IDE**
+> **Frontend is designed to be deployed via [Vercel](https://vercel.com)**.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Steps:
+1. Clone this repo
+2. Push it to GitHub.
+3. Connect the GitHub repo to Vercel.
+4. Set `index.html` as your landing page.
+5. Your frontend will be live instantly with a custom Vercel URL.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+Requirements:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+ - Backend must be hosted (e.g., Render)
+ - Frontend must point to the correct backend URL in fetch/socket connections
+ - Email SMTP (Gmail with App Password) must be configured on backend
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+🙋‍♂️ Author
+Built by Arjav Prabhu
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
 
-**Use GitHub Codespaces**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/1be9cbea-9dc4-4fde-bb7c-f440b43064aa) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
