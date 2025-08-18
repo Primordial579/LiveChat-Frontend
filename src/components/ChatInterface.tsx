@@ -45,13 +45,16 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
     });
 
     socketInstance.on('connect', () => {
+      console.log('Socket connected');
       setIsConnected(true);
       onConnect?.();
       
       // Emit appropriate connection event
       if (isHost1) {
+        console.log('Emitting host1-connected');
         socketInstance.emit('host1-connected');
       } else {
+        console.log('Emitting host2-connected');
         socketInstance.emit('host2-connected');
       }
     });
@@ -72,14 +75,17 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
     });
 
     socketInstance.on('host2-connected', () => {
+      console.log('Host2 connected event received');
       setIsHost2Connected(true);
     });
 
     socketInstance.on('host2-disconnected', () => {
+      console.log('Host2 disconnected event received');
       setIsHost2Connected(false);
     });
 
     socketInstance.on('disconnect', () => {
+      console.log('Socket disconnected');
       setIsConnected(false);
       setIsHost2Connected(false);
     });
