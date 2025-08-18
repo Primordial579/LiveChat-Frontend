@@ -59,6 +59,10 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
       }
     });
 
+    socketInstance.onAny((event, ...args) => {
+      console.log('Socket event:', event, args);
+    });
+
     socketInstance.on('message', (data) => {
       const message: Message = {
         id: Date.now().toString(),
@@ -68,10 +72,16 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
         timestamp: new Date()
       };
       setMessages(prev => [...prev, message]);
+      if (isHost1) setIsHost2Connected(true);
     });
 
     socketInstance.on('host1-name', (hostName) => {
       setReceivedOtherUserName(hostName);
+    });
+
+    socketInstance.on('host2-name', (host2Name) => {
+      setReceivedOtherUserName(host2Name);
+      if (isHost1) setIsHost2Connected(true);
     });
 
     socketInstance.on('host2-connected', () => {
