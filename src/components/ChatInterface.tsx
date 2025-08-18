@@ -33,6 +33,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isHost2Connected, setIsHost2Connected] = useState(false);
   const [displayName] = useState(userName);
   const [receivedOtherUserName, setReceivedOtherUserName] = useState(otherUserName);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -70,8 +71,17 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
       setReceivedOtherUserName(hostName);
     });
 
+    socketInstance.on('host2-connected', () => {
+      setIsHost2Connected(true);
+    });
+
+    socketInstance.on('host2-disconnected', () => {
+      setIsHost2Connected(false);
+    });
+
     socketInstance.on('disconnect', () => {
       setIsConnected(false);
+      setIsHost2Connected(false);
     });
 
     setSocket(socketInstance);
@@ -129,7 +139,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
             </h2>
             <div className="flex items-center space-x-1">
               <span className="text-sm">
-                {isConnected ? '🟢 Online' : '🔴 Offline'}
+                {isHost1 ? (isHost2Connected ? '🟢 Online' : '🔴 Offline') : (isConnected ? '🟢 Online' : '🔴 Offline')}
               </span>
             </div>
           </div>
