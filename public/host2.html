@@ -130,13 +130,13 @@
       </div>
       
       <!-- Chat Interface -->
-      <div id="chatInterface" class="hidden card p-6 w-full max-w-2xl">
+      <div id="chatInterface" class="hidden card p-6 w-full max-w-md">
         <!-- Header -->
         <div class="border-b border-border pb-4 mb-4">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-xl font-semibold">Chat with <span id="hostName">Host 1</span></h2>
-              <p id="connectionStatus" class="text-sm text-muted-foreground">Connecting...</p>
+              <p id="connectionStatus" class="text-sm">🔴 Offline</p>
             </div>
           </div>
         </div>
@@ -156,8 +156,6 @@
               class="input-field flex-1"
             />
             <button id="emojiBtn" class="btn-primary px-3">😊</button>
-            <label for="fileInput" class="btn-primary px-3 cursor-pointer">📎</label>
-            <input id="fileInput" type="file" class="hidden" accept="image/*,application/*" />
             <button id="sendBtn" class="btn-primary px-4">Send</button>
           </div>
           
@@ -200,17 +198,15 @@
         socket = io('https://livechat-p5h3.onrender.com');
         
         socket.on('connect', () => {
-          connectionStatus.textContent = 'Connected';
-          connectionStatus.classList.remove('text-red-500');
-          connectionStatus.classList.add('text-green-500');
+          connectionStatus.textContent = '🟢 Online';
+          connectionStatus.className = 'text-sm';
           // Emit host2-connected event
           socket.emit('host2-connected');
         });
         
         socket.on('disconnect', () => {
-          connectionStatus.textContent = 'Disconnected';
-          connectionStatus.classList.remove('text-green-500');
-          connectionStatus.classList.add('text-red-500');
+          connectionStatus.textContent = '🔴 Offline';
+          connectionStatus.className = 'text-sm';
         });
         
         socket.on('message', (data) => {
@@ -286,29 +282,6 @@
         emojiPicker.classList.add('hidden');
       });
       
-      // File Upload
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file || !socket) return;
-        
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const message = {
-            file: {
-              name: file.name,
-              type: file.type,
-              content: event.target.result
-            },
-            sender: currentUser,
-            timestamp: new Date().toISOString()
-          };
-          
-          addMessage(message);
-          socket.emit('message', message);
-        };
-        reader.readAsDataURL(file);
-        fileInput.value = '';
-      });
       
       // Close emoji picker when clicking outside
       document.addEventListener('click', (e) => {

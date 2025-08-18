@@ -36,7 +36,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
   const [displayName] = useState(userName);
   const [receivedOtherUserName, setReceivedOtherUserName] = useState(otherUserName);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  
 
   useEffect(() => {
     const socketInstance = io('https://livechat-p5h3.onrender.com', {
@@ -105,30 +105,6 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
     setShowEmojiPicker(false);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !socket) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const fileData = {
-        name: file.name,
-        data: reader.result as string,
-        type: file.type
-      };
-
-      const message: Message = {
-        id: Date.now().toString(),
-        file: fileData,
-        sender: 'user',
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, message]);
-      socket.emit('message', { sender: displayName, file: fileData });
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -152,12 +128,8 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
               {receivedOtherUserName || 'Waiting for connection...'}
             </h2>
             <div className="flex items-center space-x-1">
-              <div className={cn(
-                "w-2 h-2 rounded-full",
-                isConnected ? "bg-chat-online" : "bg-muted-foreground"
-              )} />
-              <span className="text-sm text-muted-foreground">
-                {isConnected ? 'Online' : 'Connecting...'}
+              <span className="text-sm">
+                {isConnected ? '🟢 Online' : '🔴 Offline'}
               </span>
             </div>
           </div>
@@ -235,21 +207,6 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
                 className="h-8 w-8 p-0"
               >
                 <Smile className="w-4 h-4" />
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                onChange={handleFileUpload}
-                className="hidden"
-                accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                className="h-8 w-8 p-0"
-              >
-                <Paperclip className="w-4 h-4" />
               </Button>
             </div>
           </div>
