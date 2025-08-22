@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,9 +26,11 @@ interface ChatInterfaceProps {
   otherUserName?: string;
   onConnect?: () => void;
   isHost1?: boolean;
+  onBothHostsConnected?: () => void;
+  hidden?: boolean;
 }
 
-export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: ChatInterfaceProps) => {
+export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onBothHostsConnected, hidden }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -72,7 +75,10 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
         timestamp: new Date()
       };
       setMessages(prev => [...prev, message]);
-      if (isHost1) setIsHost2Connected(true);
+      if (isHost1) {
+        setIsHost2Connected(true);
+        onBothHostsConnected?.();
+      }
     });
 
     socketInstance.on('host1-name', (hostName) => {
@@ -81,12 +87,18 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
 
     socketInstance.on('host2-name', (host2Name) => {
       setReceivedOtherUserName(host2Name);
-      if (isHost1) setIsHost2Connected(true);
+      if (isHost1) {
+        setIsHost2Connected(true);
+        onBothHostsConnected?.();
+      }
     });
 
     socketInstance.on('host2-connected', () => {
       console.log('Host2 connected event received');
       setIsHost2Connected(true);
+      if (isHost1) {
+        onBothHostsConnected?.();
+      }
     });
 
     socketInstance.on('host2-disconnected', () => {
@@ -105,7 +117,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
     return () => {
       socketInstance.disconnect();
     };
-  }, [onConnect, isHost1]);
+  }, [onConnect, isHost1, onBothHostsConnected]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -131,13 +143,16 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
     setShowEmojiPicker(false);
   };
 
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
+
+  if (hidden) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col h-screen bg-chat-background">
@@ -151,13 +166,8 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1 }: C
           </div>
           <div>
             <h2 className="font-semibold text-foreground">
-              {receivedOtherUserName || 'Waiting for connection...'}
+              {receivedOtherUserName || 'Chat Partner'}
             </h2>
-            <div className="flex items-center space-x-1">
-              <span className="text-sm">
-                {isHost1 ? (isHost2Connected ? '🟢 Online' : '🔴 Offline') : (isConnected ? '🟢 Online' : '🔴 Offline')}
-              </span>
-            </div>
           </div>
         </div>
       </div>

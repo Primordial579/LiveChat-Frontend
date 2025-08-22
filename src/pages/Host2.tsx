@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +33,9 @@ const Host2 = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
+            <span className="text-2xl">🎯</span>
+          </div>
           <CardTitle className="text-2xl font-bold text-foreground">
             Join Chat Room
           </CardTitle>
