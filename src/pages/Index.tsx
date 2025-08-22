@@ -13,6 +13,14 @@ const Index = () => {
   const [bothHostsConnected, setBothHostsConnected] = useState(false);
   const { toast } = useToast();
 
+  // Debug logging
+  console.log('INDEX - Current state:', { showChat, bothHostsConnected });
+
+  const handleBothHostsConnected = () => {
+    console.log('INDEX - handleBothHostsConnected called! Setting bothHostsConnected to true');
+    setBothHostsConnected(true);
+  };
+
   const handleStartChat = async () => {
     if (!name.trim()) {
       toast({
@@ -53,11 +61,6 @@ const Index = () => {
     if (e.key === 'Enter') {
       handleStartChat();
     }
-  };
-
-  const handleBothHostsConnected = () => {
-    console.log('INDEX - handleBothHostsConnected called!');
-    setBothHostsConnected(true);
   };
 
   if (showChat && bothHostsConnected) {
