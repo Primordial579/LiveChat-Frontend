@@ -200,8 +200,9 @@
         socket.on('connect', () => {
           connectionStatus.textContent = '🟢 Online';
           connectionStatus.className = 'text-sm';
-          // Emit host2-connected event
+          // Emit host2-connected and name events
           socket.emit('host2-connected');
+          socket.emit('host2-name', currentUser);
         });
         
         socket.on('disconnect', () => {

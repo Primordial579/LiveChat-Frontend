@@ -56,6 +56,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       if (isHost1) {
         console.log('Emitting host1-connected');
         socketInstance.emit('host1-connected');
+        socketInstance.emit('host1-name', displayName);
       } else {
         console.log('Emitting host2-connected');
         socketInstance.emit('host2-connected');
