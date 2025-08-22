@@ -197,26 +197,33 @@
       function connectToChat() {
         socket = io('https://livechat-p5h3.onrender.com');
         
+        console.log('HOST 2 - Connecting to chat...');
+        
         socket.on('connect', () => {
+          console.log('HOST 2 - Connected to server');
           connectionStatus.textContent = '🟢 Online';
           connectionStatus.className = 'text-sm';
           // Emit host2-connected and name events
+          console.log('HOST 2 - Emitting host2-connected and host2-name events');
           socket.emit('host2-connected');
           socket.emit('host2-name', currentUser);
         });
         
         socket.on('disconnect', () => {
+          console.log('HOST 2 - Disconnected from server');
           connectionStatus.textContent = '🔴 Offline';
           connectionStatus.className = 'text-sm';
         });
         
         socket.on('message', (data) => {
+          console.log('HOST 2 - Message received:', data);
           if (data.sender !== currentUser) {
             addMessage(data);
           }
         });
         
         socket.on('host1-name', (hostName) => {
+          console.log('HOST 2 - Received host1-name:', hostName);
           document.getElementById('hostName').textContent = hostName;
         });
       }

@@ -56,6 +56,7 @@ const Index = () => {
   };
 
   const handleBothHostsConnected = () => {
+    console.log('INDEX - handleBothHostsConnected called!');
     setBothHostsConnected(true);
   };
 

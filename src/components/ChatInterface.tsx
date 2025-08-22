@@ -64,10 +64,11 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
     });
 
     socketInstance.onAny((event, ...args) => {
-      console.log('Socket event:', event, args);
+      console.log('HOST 1 - Socket event received:', event, args);
     });
 
     socketInstance.on('message', (data) => {
+      console.log('HOST 1 - Message received:', data);
       const message: Message = {
         id: Date.now().toString(),
         text: data.text,
@@ -77,27 +78,32 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       };
       setMessages(prev => [...prev, message]);
       if (isHost1) {
+        console.log('HOST 1 - Setting host2 connected via message');
         setIsHost2Connected(true);
         onBothHostsConnected?.();
       }
     });
 
     socketInstance.on('host1-name', (hostName) => {
+      console.log('HOST 1 - Received host1-name:', hostName);
       setReceivedOtherUserName(hostName);
     });
 
     socketInstance.on('host2-name', (host2Name) => {
+      console.log('HOST 1 - Received host2-name:', host2Name);
       setReceivedOtherUserName(host2Name);
       if (isHost1) {
+        console.log('HOST 1 - Setting host2 connected via host2-name, calling onBothHostsConnected');
         setIsHost2Connected(true);
         onBothHostsConnected?.();
       }
     });
 
     socketInstance.on('host2-connected', () => {
-      console.log('Host2 connected event received');
+      console.log('HOST 1 - Host2 connected event received');
       setIsHost2Connected(true);
       if (isHost1) {
+        console.log('HOST 1 - Calling onBothHostsConnected from host2-connected');
         onBothHostsConnected?.();
       }
     });
