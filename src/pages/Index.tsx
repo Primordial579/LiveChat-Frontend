@@ -75,33 +75,34 @@ const Index = () => {
 
   if (showChat && !bothHostsConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-2xl">🎯</span>
-            </div>
-            <CardTitle className="text-2xl font-bold text-foreground">
-              Waiting for Connection
-            </CardTitle>
-            <p className="text-muted-foreground">
-              Waiting for the other participant to join...
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-            <ChatInterface 
-              userName={name}
-              otherUserName="Arjav"
-              isHost1={true}
-              onBothHostsConnected={handleBothHostsConnected}
-              hidden={true}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <ChatInterface 
+          userName={name}
+          otherUserName="Arjav"
+          isHost1={true}
+          onBothHostsConnected={handleBothHostsConnected}
+        />
+        <div className="absolute inset-0 flex items-center justify-center bg-background/90 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-2xl">🎯</span>
+              </div>
+              <CardTitle className="text-2xl font-bold text-foreground">
+                Waiting for Connection
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Waiting for the other participant to join...
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 

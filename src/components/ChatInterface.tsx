@@ -9,6 +9,8 @@ import EmojiPicker from 'emoji-picker-react';
 import { cn } from '@/lib/utils';
 import io, { Socket } from 'socket.io-client';
 
+let sharedSocket: Socket | null = null;
+
 interface Message {
   id: string;
   text?: string;
@@ -43,9 +45,14 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
   
 
   useEffect(() => {
-    const socketInstance = io('https://livechat-p5h3.onrender.com', {
-      transports: ['websocket', 'polling']
-    });
+    let socketInstance: Socket;
+    if (!sharedSocket) {
+      sharedSocket = io('https://livechat-p5h3.onrender.com', {
+        transports: ['websocket', 'polling']
+      });
+    }
+    socketInstance = sharedSocket;
+    setIsConnected(!!socketInstance.connected);
 
     socketInstance.on('connect', () => {
       console.log('HOST 1 - Socket connected');
@@ -109,7 +116,13 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
     setSocket(socketInstance);
 
     return () => {
-      socketInstance.disconnect();
+      // Do not disconnect shared socket; remove listeners added by this component
+      socketInstance.off('connect');
+      socketInstance.off('message');
+      socketInstance.off('host1-name');
+      socketInstance.off('host2-connected');
+      socketInstance.off('host2-name');
+      socketInstance.off('disconnect');
     };
   }, [onConnect, isHost1, onBothHostsConnected]);
 
