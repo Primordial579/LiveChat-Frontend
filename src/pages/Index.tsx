@@ -13,12 +13,16 @@ const Index = () => {
   const [bothHostsConnected, setBothHostsConnected] = useState(false);
   const { toast } = useToast();
 
-  // Debug logging
-  console.log('INDEX - Current state:', { showChat, bothHostsConnected });
+  // Debug logging - more detailed
+  console.log('INDEX - Current state:', { showChat, bothHostsConnected, isWaiting });
+  console.log('INDEX - Render decision - showChat && bothHostsConnected:', showChat && bothHostsConnected);
+  console.log('INDEX - Render decision - showChat && !bothHostsConnected:', showChat && !bothHostsConnected);
 
   const handleBothHostsConnected = () => {
     console.log('INDEX - handleBothHostsConnected called! Setting bothHostsConnected to true');
+    console.log('INDEX - Current bothHostsConnected state before update:', bothHostsConnected);
     setBothHostsConnected(true);
+    console.log('INDEX - Called setBothHostsConnected(true)');
   };
 
   const handleStartChat = async () => {
