@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChatInterface } from '@/components/ChatInterface';
+import { ConnectionOverlay } from '@/components/ConnectionOverlay';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -12,17 +13,18 @@ const Index = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [bothHostsConnected, setBothHostsConnected] = useState(false);
   const { toast } = useToast();
+  const [phase, setPhase] = useState<'connecting' | 'waiting-peer' | 'connected' | 'disconnected' | 'error'>('connecting');
 
   // Debug logging - more detailed
-  console.log('INDEX - Current state:', { showChat, bothHostsConnected, isWaiting });
-  console.log('INDEX - Render decision - showChat && bothHostsConnected:', showChat && bothHostsConnected);
-  console.log('INDEX - Render decision - showChat && !bothHostsConnected:', showChat && !bothHostsConnected);
+  console.log('INDEX - Current state:', { showChat, bothHostsConnected, isWaiting, phase });
+  console.log('INDEX - Render decision - showChat && phase!=="connected":', showChat && phase !== 'connected');
 
   const handleBothHostsConnected = () => {
     console.log('INDEX - handleBothHostsConnected called! Setting bothHostsConnected to true');
     console.log('INDEX - Current bothHostsConnected state before update:', bothHostsConnected);
     setBothHostsConnected(true);
-    console.log('INDEX - Called setBothHostsConnected(true)');
+    setPhase('connected');
+    console.log('INDEX - Called setBothHostsConnected(true) and setPhase("connected")');
   };
 
   const handleStartChat = async () => {
@@ -74,30 +76,11 @@ const Index = () => {
           userName={name}
           otherUserName="Arjav"
           isHost1={true}
+          onConnect={() => setPhase('waiting-peer')}
           onBothHostsConnected={handleBothHostsConnected}
+          onStatusChange={(s) => setPhase(s as any)}
         />
-        {!bothHostsConnected && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/95 z-50">
-            <Card className="w-full max-w-md">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-2xl">🎯</span>
-                </div>
-                <CardTitle className="text-2xl font-bold text-foreground">
-                  Waiting for Connection
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Waiting for the other participant to join...
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <ConnectionOverlay phase={phase} />
       </div>
     );
   }

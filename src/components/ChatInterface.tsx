@@ -29,10 +29,11 @@ interface ChatInterfaceProps {
   onConnect?: () => void;
   isHost1?: boolean;
   onBothHostsConnected?: () => void;
+  onStatusChange?: (status: 'connecting' | 'waiting-peer' | 'connected' | 'disconnected' | 'error') => void;
   hidden?: boolean;
 }
 
-export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onBothHostsConnected, hidden }: ChatInterfaceProps) => {
+export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onBothHostsConnected, onStatusChange, hidden }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -58,6 +59,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       console.log('HOST 1 - Socket connected');
       setIsConnected(true);
       onConnect?.();
+      onStatusChange?.('waiting-peer');
       
       // Emit appropriate connection event
       if (isHost1) {
@@ -76,6 +78,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       if (isHost1) {
         console.log('HOST 1 - Setting host2 connected via host2-connected event');
         setIsHost2Connected(true);
+        onStatusChange?.('connected');
         onBothHostsConnected?.();
       }
     });
@@ -86,8 +89,14 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       if (isHost1) {
         console.log('HOST 1 - Setting host2 connected via host2-name event');
         setIsHost2Connected(true);
+        onStatusChange?.('connected');
         onBothHostsConnected?.();
       }
+    });
+
+    socketInstance.on('connect_error', (err) => {
+      console.log('HOST 1 - connect_error', err);
+      onStatusChange?.('error');
     });
 
     socketInstance.on('message', (data) => {
@@ -111,6 +120,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       console.log('HOST 1 - Socket disconnected');
       setIsConnected(false);
       setIsHost2Connected(false);
+      onStatusChange?.('disconnected');
     });
 
     setSocket(socketInstance);
@@ -122,6 +132,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       socketInstance.off('host1-name');
       socketInstance.off('host2-connected');
       socketInstance.off('host2-name');
+      socketInstance.off('connect_error');
       socketInstance.off('disconnect');
     };
   }, [onConnect, isHost1, onBothHostsConnected]);
