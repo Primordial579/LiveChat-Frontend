@@ -63,13 +63,21 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       }
     });
 
-    // Listen for ANY socket event as proof of Host 2 connection
-    socketInstance.onAny((event, ...args) => {
-      console.log('HOST 1 - Socket event received:', event, args);
-      
-      // If we receive any message, host2-name, or host2-connected event, consider Host 2 connected
-      if (isHost1 && (event === 'message' || event === 'host2-name' || event === 'host2-connected')) {
-        console.log('HOST 1 - Detected Host 2 activity, setting connected');
+    // Specific event listeners for Host 2 connection detection
+    socketInstance.on('host2-connected', () => {
+      console.log('HOST 1 - Host2 connected event received');
+      if (isHost1) {
+        console.log('HOST 1 - Setting host2 connected via host2-connected event');
+        setIsHost2Connected(true);
+        onBothHostsConnected?.();
+      }
+    });
+
+    socketInstance.on('host2-name', (host2Name) => {
+      console.log('HOST 1 - Received host2-name:', host2Name);
+      setReceivedOtherUserName(host2Name);
+      if (isHost1) {
+        console.log('HOST 1 - Setting host2 connected via host2-name event');
         setIsHost2Connected(true);
         onBothHostsConnected?.();
       }
@@ -90,11 +98,6 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
     socketInstance.on('host1-name', (hostName) => {
       console.log('HOST 1 - Received host1-name:', hostName);
       setReceivedOtherUserName(hostName);
-    });
-
-    socketInstance.on('host2-name', (host2Name) => {
-      console.log('HOST 1 - Received host2-name:', host2Name);
-      setReceivedOtherUserName(host2Name);
     });
 
     socketInstance.on('disconnect', () => {
