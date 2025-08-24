@@ -182,20 +182,27 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
               {otherUserName ? otherUserName[0].toUpperCase() : '?'}
             </span>
           </div>
-           <div>
-             <h2 className="font-semibold text-foreground">
-               {receivedOtherUserName || 'Chat Partner'}
-             </h2>
-             <div className="flex items-center space-x-2">
-               <div className={cn(
-                 "w-3 h-3 rounded-full",
-                 isHost2Connected ? "bg-chat-online" : "bg-muted"
-               )} />
-               <span className="text-sm text-foreground">
-                 {isHost2Connected ? 'Online' : 'Offline'}
-               </span>
-             </div>
-           </div>
+             <div>
+              <h2 className="font-semibold text-foreground">
+                {receivedOtherUserName || 'Chat Partner'}
+              </h2>
+              <div className="flex items-center space-x-2 mt-1">
+                <div className={cn(
+                  "w-3 h-3 rounded-full border-2",
+                  isHost2Connected 
+                    ? "bg-chat-online border-chat-online" 
+                    : "bg-destructive border-destructive"
+                )} />
+                <span className={cn(
+                  "text-xs font-medium",
+                  isHost2Connected 
+                    ? "text-chat-online" 
+                    : "text-destructive"
+                )}>
+                  {isHost2Connected ? 'Online' : 'Offline'}
+                </span>
+              </div>
+            </div>
         </div>
       </div>
 
