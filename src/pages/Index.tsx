@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChatInterface } from '@/components/ChatInterface';
-import { ConnectionOverlay } from '@/components/ConnectionOverlay';
+
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -80,7 +80,7 @@ const Index = () => {
           onBothHostsConnected={handleBothHostsConnected}
           onStatusChange={(s) => setPhase(s as any)}
         />
-        {!bothHostsConnected && <ConnectionOverlay phase={phase} />}
+        
       </div>
     );
   }
