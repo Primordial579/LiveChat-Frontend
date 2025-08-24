@@ -11,21 +11,8 @@ const Index = () => {
   const [name, setName] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [bothHostsConnected, setBothHostsConnected] = useState(false);
   const { toast } = useToast();
-  const [phase, setPhase] = useState<'connecting' | 'waiting-peer' | 'connected' | 'disconnected' | 'error'>('connecting');
 
-  // Debug logging - more detailed
-  console.log('INDEX - Current state:', { showChat, bothHostsConnected, isWaiting, phase });
-  console.log('INDEX - Render decision - showChat && phase!=="connected":', showChat && phase !== 'connected');
-
-  const handleBothHostsConnected = () => {
-    console.log('INDEX - handleBothHostsConnected called! Setting bothHostsConnected to true');
-    console.log('INDEX - Current bothHostsConnected state before update:', bothHostsConnected);
-    setBothHostsConnected(true);
-    setPhase('connected');
-    console.log('INDEX - Called setBothHostsConnected(true) and setPhase("connected")');
-  };
 
   const handleStartChat = async () => {
     if (!name.trim()) {
@@ -76,9 +63,6 @@ const Index = () => {
           userName={name}
           otherUserName="Arjav"
           isHost1={true}
-          onConnect={() => setPhase('waiting-peer')}
-          onBothHostsConnected={handleBothHostsConnected}
-          onStatusChange={(s) => setPhase(s as any)}
         />
         
       </div>
