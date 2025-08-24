@@ -40,6 +40,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isHost2Connected, setIsHost2Connected] = useState(false);
+  const [isHost1Connected, setIsHost1Connected] = useState(false);
   const [displayName] = useState(userName);
   const [receivedOtherUserName, setReceivedOtherUserName] = useState(otherUserName);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -67,17 +68,28 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
         socketInstance.emit('host1-connected');
         socketInstance.emit('host1-name', displayName);
       } else {
-        console.log('Emitting host2-connected');
+        console.log('Emitting host2-connected and name');
         socketInstance.emit('host2-connected');
+        socketInstance.emit('host2-name', displayName);
       }
     });
 
-    // Specific event listeners for Host 2 connection detection
+    // Connection detection for both hosts
     socketInstance.on('host2-connected', () => {
       console.log('HOST 1 - Host2 connected event received');
       if (isHost1) {
         console.log('HOST 1 - Setting host2 connected via host2-connected event');
         setIsHost2Connected(true);
+        onStatusChange?.('connected');
+        onBothHostsConnected?.();
+      }
+    });
+
+    socketInstance.on('host1-connected', () => {
+      console.log('HOST 2 - Host1 connected event received');
+      if (!isHost1) {
+        console.log('HOST 2 - Setting host1 connected via host1-connected event');
+        setIsHost1Connected(true);
         onStatusChange?.('connected');
         onBothHostsConnected?.();
       }
@@ -112,14 +124,21 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
     });
 
     socketInstance.on('host1-name', (hostName) => {
-      console.log('HOST 1 - Received host1-name:', hostName);
+      console.log('HOST 2 - Received host1-name:', hostName);
       setReceivedOtherUserName(hostName);
+      if (!isHost1) {
+        console.log('HOST 2 - Setting host1 connected via host1-name event');
+        setIsHost1Connected(true);
+        onStatusChange?.('connected');
+        onBothHostsConnected?.();
+      }
     });
 
     socketInstance.on('disconnect', () => {
-      console.log('HOST 1 - Socket disconnected');
+      console.log('Socket disconnected');
       setIsConnected(false);
       setIsHost2Connected(false);
+      setIsHost1Connected(false);
       onStatusChange?.('disconnected');
     });
 
@@ -130,6 +149,7 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
       socketInstance.off('connect');
       socketInstance.off('message');
       socketInstance.off('host1-name');
+      socketInstance.off('host1-connected');
       socketInstance.off('host2-connected');
       socketInstance.off('host2-name');
       socketInstance.off('connect_error');
@@ -189,17 +209,17 @@ export const ChatInterface = ({ userName, otherUserName, onConnect, isHost1, onB
               <div className="flex items-center space-x-2 mt-1">
                 <div className={cn(
                   "w-3 h-3 rounded-full border-2",
-                  isHost2Connected 
+                  (isHost1 ? isHost2Connected : isHost1Connected)
                     ? "bg-chat-online border-chat-online" 
                     : "bg-destructive border-destructive"
                 )} />
                 <span className={cn(
                   "text-xs font-medium",
-                  isHost2Connected 
+                  (isHost1 ? isHost2Connected : isHost1Connected)
                     ? "text-chat-online" 
                     : "text-destructive"
                 )}>
-                  {isHost2Connected ? 'Online' : 'Offline'}
+                  {(isHost1 ? isHost2Connected : isHost1Connected) ? 'Online' : 'Offline'}
                 </span>
               </div>
             </div>
