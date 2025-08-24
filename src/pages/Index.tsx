@@ -80,7 +80,7 @@ const Index = () => {
           onBothHostsConnected={handleBothHostsConnected}
           onStatusChange={(s) => setPhase(s as any)}
         />
-        <ConnectionOverlay phase={phase} />
+        {!bothHostsConnected && <ConnectionOverlay phase={phase} />}
       </div>
     );
   }
