@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChatInterface } from '@/components/ChatInterface';
-
+import chatIcon from '@/assets/chat-icon.jpg';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -73,8 +73,8 @@ const Index = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-2xl">🎯</span>
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden">
+            <img src={chatIcon} alt="Chat Icon" className="w-full h-full object-cover" />
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">
             Start Live Chat
